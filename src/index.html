@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application -MVC + CRUD</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!--Top Header of the application-->
+    <main class="chat-interface">
+        <header class="chat-header">
+          <div class="header-left">
+            <h1>Chat Application</h1>
+            <p>MVC Architecture with CRUD Operations</p>
+          </div>
+          <div class="header-right">
+            <span id="messageCount" class="messsage-count">0 Messages</span>
+          </div>
+          </header>
+<!---->
+    <div class="toolbar">
+        <button id=" exportChat" class="btn"> Export Chat</button>
+        <label class="btn import-label" title="Import JSON">
+
+    
+            <input id="importFile" type="file"  accept="application/Json" hidden>
+            Import Chat 
+        </label>
+          <button id="clearChat" class="btn danger">Clear All</button>
+    </div>
