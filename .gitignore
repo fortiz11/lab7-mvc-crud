@@ -1,0 +1,62 @@
+# -------------------------------
+# General
+# -------------------------------
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+node_modules/
+
+# -------------------------------
+# Build / output directories
+# -------------------------------
+dist/
+build/
+coverage/
+
+# -------------------------------
+# Local IDE / editor files
+# -------------------------------
+.vscode/
+.idea/
+*.code-workspace
+
+# -------------------------------
+# Environment and secrets
+# -------------------------------
+.env
+.env.local
+.env.*.local
+
+# -------------------------------
+# OS and system junk
+# -------------------------------
+*.swp
+*.tmp
+*.bak
+*.orig
+*.old
+*~
+ehthumbs.db
+Icon?
+
+# -------------------------------
+# Compiled / generated assets
+# -------------------------------
+*.zip
+*.tar
+*.gz
+*.rar
+
+# -------------------------------
+# Project-specific
+# -------------------------------
+# Exclude exported chats and JSON backups
+chat-export.json
+*.json.backup
+
+# Don’t ignore your real source code:
+# src/, js/, index.html, styles.css all stay tracked.
