@@ -95,6 +95,7 @@ export class ChatView {
   //connects DOM event to a function that will be called by the controller 
   onSubmit(fn) {
     this.handlers.submit = fn;
+    //attaches the function to the submit event 
     this.formEl.addEventListener("submit", fn);
   }
   onClearAll(fn) {
@@ -114,5 +115,41 @@ export class ChatView {
   }
   onDelete(fn) {
     this.handlers.del = fn;
+  }
+
+
+//renders the entire chat view
+renderAll(messages){
+  //empties the container to be able to start with a fresh view rendering 
+  this.listEl.innerHTML= '';
+  messages.forEach(m=> this._appendMessage(m));
+  this._afterRender(messages.length);
+}
+
+//meant to add one message to the screen
+appendMessage(msg){
+  this._appendMessage(msg);
+  this._afterRender();
+}
+
+updateMessage(msg){
+  const li =this.listEl.querySelector(`[data-message-id="${msg.id}"]`);
+  if(!li) return;
+  li.querySelector('.text').textContent = msg.text;
+  li.classList.toggle('edited', !!msg.edited);
+}
+
+removeMessage(id){
+  //finds the element that matches message ID
+  this.listEl.querySelector(`[data-message-id="${id}]`)?.remove();
+  this._afterRender();
+}
+
+setCounts(n){this.messageCountEl.textContent= `${n} message${n===1?'':'s'}`;}
+
+setLastSaved(date){
+  if(!date){
+    this.lastSavedEl.textContent= '-'; return;}
+    const fmt= new Intl.DateTimeFormat(undefined, {hour:'2-digit', minute:'2-digit'}).format(dt);
   }
 }
