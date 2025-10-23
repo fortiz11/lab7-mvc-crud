@@ -50,7 +50,10 @@ export class ChatController {
     this.view.clearBtn.addEventListener("click", this.handleClear);
 
     // Import/export chat JSON
-    this.view.importBtn.addEventListener("click", this.handleImport);
+    // the import input is a file input; listen for change
+    if (this.view.importInput) {
+      this.view.importInput.addEventListener('change', this.handleImport);
+    }
     this.view.exportBtn.addEventListener("click", this.handleExport);
   }
 
@@ -87,7 +90,7 @@ export class ChatController {
 
     const newText = prompt("Edit your message:", msg.text);
     if (newText !== null && newText.trim() !== msg.text) {
-      this.model.updateMessage(id, newText.trim());
+      this.model.updateMessage(id, {text: newText.trim()});
     }
   }
 
@@ -129,22 +132,20 @@ export class ChatController {
   }
 
 
-  handleImport() {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "application/json";
-    input.onchange = async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+  async handleImport(e) {
+  const file = e?.target?.files?.[0];
+  if (!file) return;
 
-      const text = await file.text();
-      try {
-        const importedMessages = JSON.parse(text);
-        this.model.replaceAll(importedMessages);
-      } catch (err) {
-        alert("Import failed: Invalid JSON file.");
-      }
+  const text = await file.text();
+  try {
+    const importedMessages = JSON.parse(text);
+    this.model.replaceAll(importedMessages);
+  } catch (err) {
+    alert("Import failed: Invalid JSON file.");
+  
+
+      // clear the input so re-importing same file later still fires change
+      e.target.value = '';
     };
-    input.click();
   }
 }

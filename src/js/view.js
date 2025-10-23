@@ -25,7 +25,7 @@ export class ChatView {
     this.messageCountEl = messageCountEl;
     this.lastSavedEl = lastSavedEl;
 
-    this.handler = {
+    this.handlers = {
       submit: null,
       clearAll: null,
       export: null,
@@ -34,21 +34,24 @@ export class ChatView {
       del: null,
     };
 
+    // expose the template with a consistent property name
+    this.template = messageTemplate;
+
     // Subscribe to model events
     this.unsubscribe = this.model.subscribe((evt) => {
       // extracts info from the event
       const { type, payload } = evt;
 
       if (type === "loaded") {
-        //if payload is defined then it is used. If not then use empty array
+        // if payload is defined then it is used. If not then use empty array
         this.renderAll(payload.messages ?? []);
-        //updates message count
-        this.setCount(this.model.messages.length);
+        // updates message count
+        this.setCounts(this.model.messages.length);
       }
 
       if (type === "created") {
         this.appendMessage(payload.message);
-        this.setCount(this.model.message.length);
+        this.setCounts(this.model.messages.length);
       }
 
       if (type === "updated") {
@@ -57,7 +60,7 @@ export class ChatView {
 
       if (type === "deleted") {
         this.removeMessage(payload.message.id);
-        this.setCount(this.model.message.length);
+        this.setCounts(this.model.messages.length);
       }
 
       if (type === "cleared") {
@@ -77,16 +80,14 @@ export class ChatView {
     });
 
     this.listEl.addEventListener("click", (e) => {
-      //finds the nearest ancestor that matches CSS selector
-      const btn = e.target.closet("button[data-action]");
+      // finds the nearest ancestor that matches CSS selector
+      const btn = e.target.closest("button[data-action]");
       if (!btn) return;
-      //once the button is clicked, finds which message it belongs to.
-      const li = btn.closet("[data-message-id]");
+      // once the button is clicked, finds which message it belongs to.
+      const li = btn.closest("[data-message-id]");
       if (!li) return;
       const id = li.dataset.messageId;
-      if (btn.dataset.action === "edit")
-        //checks if this.handlers.edit exists
-        this.handlers.edit?.(id);
+      if (btn.dataset.action === "edit") this.handlers.edit?.(id);
       if (btn.dataset.action === "delete") this.handlers.del?.(id);
     });
   }
@@ -140,7 +141,7 @@ export class ChatView {
   }
 
   removeMessage(id) {
-    this.listEl.querySelector(`[data-message-id="${id}]`)?.remove();
+    this.listEl.querySelector(`[data-message-id="${id}"]`)?.remove();
     this._afterRender();
   }
 
@@ -158,7 +159,8 @@ export class ChatView {
     const fmt = new Intl.DateTimeFormat(undefined, {
       hour: "2-digit",
       minute: "2-digit",
-    }).format(dt);
+    }).format(date);
+    this.lastSavedEl.textContent = fmt;
   }
 
   clearComposer() {
