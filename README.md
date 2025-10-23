@@ -8,7 +8,7 @@ The bot uses a simple **Eliza-like response system** (`eliza.js`) to simulate co
 
 ## 🚀 Live Demo
 _Deployed on [Netlify](https://www.netlify.com/)_  
-👉 
+👉 melodious-boba-9d41b7.netlify.app
 
 ---
 
