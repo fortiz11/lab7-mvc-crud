@@ -91,11 +91,10 @@ export class ChatView {
     });
   }
 
-
-  //connects DOM event to a function that will be called by the controller 
+  //connects DOM event to a function that will be called by the controller
   onSubmit(fn) {
     this.handlers.submit = fn;
-    //attaches the function to the submit event 
+    //attaches the function to the submit event
     this.formEl.addEventListener("submit", fn);
   }
   onClearAll(fn) {
@@ -117,39 +116,98 @@ export class ChatView {
     this.handlers.del = fn;
   }
 
+  //renders the entire chat view
+  renderAll(messages) {
+    //empties the container to be able to start with a fresh view rendering
+    this.listEl.innerHTML = "";
+    messages.forEach((m) => this._appendMessage(m));
+    this._afterRender(messages.length);
+  }
 
-//renders the entire chat view
-renderAll(messages){
-  //empties the container to be able to start with a fresh view rendering 
-  this.listEl.innerHTML= '';
-  messages.forEach(m=> this._appendMessage(m));
-  this._afterRender(messages.length);
-}
+  //meant to add one message to the screen
+  appendMessage(msg) {
+    this._appendMessage(msg);
+    this._afterRender();
+  }
 
-//meant to add one message to the screen
-appendMessage(msg){
-  this._appendMessage(msg);
-  this._afterRender();
-}
+  updateMessage(msg) {
+    //finds the element that matches message ID
+    const li = this.listEl.querySelector(`[data-message-id="${msg.id}"]`);
+    if (!li) return;
+    li.querySelector(".text").textContent = msg.text;
+    //updates edited flag
+    li.classList.toggle("edited", !!msg.edited);
+  }
 
-updateMessage(msg){
-  const li =this.listEl.querySelector(`[data-message-id="${msg.id}"]`);
-  if(!li) return;
-  li.querySelector('.text').textContent = msg.text;
-  li.classList.toggle('edited', !!msg.edited);
-}
+  removeMessage(id) {
+    this.listEl.querySelector(`[data-message-id="${id}]`)?.remove();
+    this._afterRender();
+  }
 
-removeMessage(id){
-  //finds the element that matches message ID
-  this.listEl.querySelector(`[data-message-id="${id}]`)?.remove();
-  this._afterRender();
-}
+  //calculates messages in chat
+  setCounts(n) {
+    //Condition if there is exactly one message or multiple
+    this.messageCountEl.textContent = `${n} message${n === 1 ? "" : "s"}`;
+  }
 
-setCounts(n){this.messageCountEl.textContent= `${n} message${n===1?'':'s'}`;}
+  setLastSaved(date) {
+    if (!date) {
+      this.lastSavedEl.textContent = "-";
+      return;
+    }
+    const fmt = new Intl.DateTimeFormat(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(dt);
+  }
 
-setLastSaved(date){
-  if(!date){
-    this.lastSavedEl.textContent= '-'; return;}
-    const fmt= new Intl.DateTimeFormat(undefined, {hour:'2-digit', minute:'2-digit'}).format(dt);
+  clearComposer() {
+    this.inputEl.value = "";
+    this.inputEl.focus();
+  }
+
+  confirm(t) {
+    return window.confirm(t);
+  }
+  prompt(t, d = "") {
+    return window.prompt(t, d);
+  }
+
+
+  //internal helper that creates and appends a single chat message element
+  _appendMessage(msg) {
+    const li = this.template.content.firstElementChild.cloneNode(true);
+    li.dataset.messageId = msg.id;
+
+    const wrapper = li.firstElementChild;
+    wrapper.classList.remove("user", "message-bot");
+    wrapper.classList.add(msg.isUser ? "user" : "message-bot");
+
+    li.classList.toggle("edited", !!msg.edited);
+    li.querySelector(".sender").textContent = msg.isUser ? "You" : "Eliza";
+    li.querySelector(".text").textContent = msg.text;
+
+    const t = li.querySelector(".timestamp");
+    const dt =
+      msg.timestamp instanceof Date ? msg.timestamp : new Date(msg.timestamp);
+    t.dateTime = dt.toISOString();
+    t.textContent = new Intl.DateTimeFormat(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(dt);
+
+    const actions = li.querySelector(".actions");
+    actions.innerHTML = msg.isUser
+      ? `<button data-action="edit" aria-label="Edit">Edit</button>
+         <button data-action="delete" aria-label="Delete">Delete</button>`
+      : "";
+
+    this.listEl.appendChild(li);
+  }
+//helper that updates interface after messages are added and removed
+  _afterRender(n = this.listEl.children.length) {
+    this.emptyEl.style.display = n ? "none" : "block";
+    this.listEl.scrollTop = this.listEl.scrollHeight;
+    this.setCounts(n);
   }
 }
